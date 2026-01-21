@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GripX - Fitness Forward</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* --- BASE STYLES --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body, html {
+            height: 100%;
+            background-color: #0b010d;
+            overflow-x: hidden;
+            color: white;
+        }
+
+        /* =========================================
+           YOUR NAVBAR CSS
+           ========================================= */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 25px 8%;
+            transition: all 0.4s ease-in-out;
+            z-index: 1000;
+            background-color: transparent; 
+        }
+
+        .navbar.scrolled {
+            background-color: #2d2d2d !important; 
+            padding: 12px 8%;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo-img {
+            height: 60px;
+            width: auto;
+            transition: all 0.3s ease;
+        }
+
+        .navbar.scrolled .logo-img {
+            height: 45px;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 10px;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+            padding: 8px 20px;
+            border: 1px solid transparent;
+            border-radius: 50px;
+            transition: 0.3s;
+        }
+
+        .nav-links a:hover {
+            border-color: #00b7ff;
+            color: #00b7ff;
+        }
+
+        .nav-icons {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .icon-btn {
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            width: 42px;
+            height: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transition: 0.3s;
+            position: relative;
+        }
+
+        .icon-btn:hover {
+            border-color: #00b7ff;
+            color: #00b7ff;
+        }
+
+        /* --- CART BADGE --- */
+        #cart-count {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #00b7ff;
+            color: white;
+            font-size: 10px;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: none; /* Shown via JS */
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .menu-btn {
+            display: none; 
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            width: 42px;
+            height: 42px;
+            align-items: center;
+            justify-content: center;
+            transition: 0.3s;
+            margin-right: 10px;
+            z-index: 2001; 
+        }
+
+        /* --- MOBILE MENU STYLES --- */
+        @media (max-width: 992px) {
+            .menu-btn { display: flex; order: 2; }
+            .nav-icons { order: 3; }
+            .logo-container { order: 1; margin-right: auto; }
+
+            .nav-links { 
+                position: fixed;
+                top: 0;
+                left: -100%;
+                width: 80%;
+                height: 100vh;
+                background-color: rgba(10, 1, 13, 0.98);
+                backdrop-filter: blur(15px);
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                gap: 40px;
+                transition: left 0.4s cubic-bezier(0.77, 0, 0.175, 1);
+                z-index: 2000;
+            }
+
+            .nav-links.active {
+                left: 0;
+            }
+
+            .nav-links a {
+                font-size: 28px;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 2px;
+                border: none;
+                padding: 10px 0;
+            }
+        }
+
+        /* =========================================
+           CART DRAWER CSS
+           ========================================= */
+        #cart-drawer {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 100%;
+            max-width: 400px;
+            height: 100vh;
+            background: #111;
+            z-index: 3000;
+            transition: 0.5s cubic-bezier(0.77, 0, 0.175, 1);
+            padding: 40px 30px;
+            box-shadow: -10px 0 30px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+        }
+
+        #cart-drawer.active { right: 0; }
+
+        /* =========================================
+           HERO & SHOP CSS
+           ========================================= */
+        .hero {
+            height: 100vh;
+            width: 100%;
+            background: radial-gradient(circle at 15% 35%, rgba(0, 110, 255, 0.2) 0%, transparent 45%),
+                        radial-gradient(circle at 85% 75%, rgba(0, 255, 204, 0.15) 0%, transparent 45%),
+                        #0b010d;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 10%;
+        }
+        
+        .hero-content h1 {
+            font-size: clamp(40px, 6vw, 70px);
+            line-height: 1.1;
+            margin-bottom: 25px;
+            text-transform: uppercase;
+            font-weight: 800;
+        }
+
+        .hero-content h1 span { color: #00b7ff; }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-30px); }
+        }
+
+        @media (max-width: 992px) {
+            .hero { flex-direction: column; text-align: center; padding-top: 120px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- =========================================
+         YOUR NAVBAR HTML
+         ========================================= -->
+    <nav class="navbar" id="mainNav">
+        <a href="#" class="logo-container">
+            <img src="grip x logo.jpg" alt="GripX" class="logo-img" onerror="this.style.display='none'; this.parentElement.innerHTML='<span class=\'text-2xl font-bold italic\'>GRIP<span class=\'text-blue-500\'>X</span></span>'">
+        </a>
+        
+        <div class="menu-btn" id="menu-toggle">
+            <i class="fas fa-bars"></i>
+        </div>
+
+        <ul class="nav-links" id="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="contactus.html">contact Us            
+            </a></li>
+            <li><a href="shop.html">Shop</a></li>
+            <li><a href="return.html">return</a></li>
+        </ul>
+
+        <div class="nav-icons">
+            <div class="icon-btn" id="search-open"><i class="fas fa-search"></i></div>
+            <div class="icon-btn" id="cart-open">
+                <i class="fas fa-shopping-cart"></i>
+                <span id="cart-count">0</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Cart Drawer -->
+    <div id="cart-drawer">
+        <div class="flex justify-between items-center mb-8 border-b border-white/10 pb-4">
+            <h2 class="text-2xl font-bold uppercase">Your <span class="text-blue-500">Cart</span></h2>
+            <div id="cart-close" class="text-3xl cursor-pointer hover:text-blue-500 transition">&times;</div>
+        </div>
+        
+        <div id="cart-items" class="flex-1 overflow-y-auto space-y-4 mb-4">
+            <!-- Items injected here by JS -->
+        </div>
+
+        <div class="border-t border-white/10 pt-6">
+            <div class="flex justify-between text-xl font-bold mb-6">
+                <span>Total:</span>
+                <span id="cart-total" class="text-blue-400">$0.00</span>
+            </div>
+            <button onclick="goToCheckout()" class="w-full bg-blue-600 py-4 rounded-xl font-bold uppercase hover:bg-blue-700 transition shadow-lg shadow-blue-900/20">
+                Proceed to Checkout
+            </button>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="hero relative">
+        <div class="hero-content z-10">
+            <h1>Unleash <br><span>Your Power</span></h1>
+            <p class="text-white/60 mb-8 max-w-md">Premium gear for elite athletes. Elevate your training with GripX technology.</p>
+            <a href="#shop" class="inline-block bg-blue-600 px-8 py-3 rounded-full font-bold uppercase tracking-wide hover:bg-blue-700 transition">Shop Now</a>
+        </div>
+        <div class="absolute right-0 top-0 h-full w-1/2 opacity-20 pointer-events-none bg-gradient-to-l from-blue-900/30 to-transparent"></div>
+    </section>
+
+    <!-- Shop Section -->
+    <section id="shop" class="py-20 px-[5%] bg-white/5">
+        <div class="text-center mb-16">
+            <h2 class="text-4xl font-bold uppercase tracking-widest">Elite <span class="text-blue-500">Shop</span></h2>
+            <p class="text-white/40 mt-2">Gear up for greatness</p>
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-8" id="product-grid">
+            <!-- Products injected by JS -->
+        </div>
+    </section>
+
+    <footer class="py-10 text-center border-t border-white/10 opacity-40 text-xs">
+        &copy; 2024 GripX Fitness Equipment. All Rights Reserved.
+    </footer>
+
+    <!-- Search Overlay -->
+    <div id="search-overlay" class="fixed inset-0 bg-black/95 z-[2000] flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300">
+        <div id="search-close" class="absolute top-10 right-10 text-white text-5xl cursor-pointer hover:text-blue-500 transition">&times;</div>
+        <input type="text" placeholder="Search products..." class="w-2/3 bg-transparent border-b-2 border-blue-500 text-3xl p-4 text-white outline-none">
+    </div>
+
+    <script>
+        // =========================================
+        // NAVBAR & SEARCH LOGIC
+        // =========================================
+        const navbar = document.getElementById('mainNav');
+        const sOpen = document.getElementById('search-open');
+        const sClose = document.getElementById('search-close');
+        const sOverlay = document.getElementById('search-overlay');
+        const menuToggle = document.getElementById('menu-toggle');
+        const navLinks = document.getElementById('nav-links');
+        const menuIcon = menuToggle.querySelector('i');
+
+        // Scroll Effect
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 20) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // Search Overlay
+        sOpen.onclick = () => { sOverlay.style.opacity = "1"; sOverlay.style.pointerEvents = "auto"; }
+        sClose.onclick = () => { sOverlay.style.opacity = "0"; sOverlay.style.pointerEvents = "none"; }
+
+        // Mobile Menu
+        menuToggle.onclick = () => {
+            navLinks.classList.toggle('active');
+            menuIcon.classList.toggle('fa-bars');
+            menuIcon.classList.toggle('fa-times');
+        }
+
+        // =========================================
+        // SHOP & CART LOGIC
+        // =========================================
+        
+        const products = [
+            { id: 1, name: "Pro Grip Gloves", price: 45.00, img: "fa-hand-rock" },
+            { id: 2, name: "Wrist Wraps", price: 25.00, img: "fa-ring" },
+            { id: 3, name: "Lifting Belt", price: 89.00, img: "fa-minus" }, 
+            { id: 4, name: "Speed Rope", price: 20.00, img: "fa-infinity" }, 
+            { id: 5, name: "Liquid Chalk", price: 15.00, img: "fa-flask" },
+            { id: 6, name: "Knee Sleeves", price: 55.00, img: "fa-socks" },
+            { id: 7, name: "Gym Bag", price: 65.00, img: "fa-suitcase" },
+            { id: 8, name: "Muscle Tank", price: 30.00, img: "fa-tshirt" },
+            { id: 9, name: "Lifting Straps", price: 18.00, img: "fa-ribbon" },
+            { id: 10, name: "Compression Socks", price: 22.00, img: "fa-socks" }
+        ];
+
+        // Load cart
+        let cart = JSON.parse(localStorage.getItem('gripx_cart')) || [];
+
+        const cartDrawer = document.getElementById('cart-drawer');
+        const cartItemsContainer = document.getElementById('cart-items');
+        const cartCountBadge = document.getElementById('cart-count');
+        const cartTotalDisplay = document.getElementById('cart-total');
+
+        // Render Products with LINKS restored
+        const productGrid = document.getElementById('product-grid');
+        productGrid.innerHTML = products.map(p => `
+            <div class="group bg-[#161616] border border-white/5 rounded-2xl p-4 transition-all hover:border-blue-500/50 hover:shadow-lg hover:shadow-blue-500/10 flex flex-col">
+                <!-- WRAPPED IMAGE IN A LINK -->
+                <a href="product${p.id}.html" class="block mb-4 flex-1 cursor-pointer">
+                    <div class="bg-black/40 rounded-xl p-6 h-full flex items-center justify-center aspect-square text-6xl text-white/20 group-hover:text-white/80 transition-colors">
+                        <i class="fas ${p.img}"></i>
+                    </div>
+                </a>
+                
+                <!-- WRAPPED TITLE IN A LINK -->
+                <h3 class="font-bold text-sm md:text-base truncate uppercase mb-1">
+                    <a href="product${p.id}.html" class="hover:text-blue-500 transition">${p.name}</a>
+                </h3>
+                
+                <p class="text-blue-500 font-bold mb-4">$${p.price.toFixed(2)}</p>
+                
+                <button onclick="addItemToCart('${p.name}', ${p.price})" class="w-full py-2 bg-white/5 border border-white/10 rounded-lg text-[10px] font-bold uppercase hover:bg-blue-600 hover:border-blue-600 transition-all text-white">
+                    Add to Cart
+                </button>
+            </div>
+        `).join('');
+
+        // Cart Drawer Toggles
+        document.getElementById('cart-open').onclick = () => cartDrawer.classList.add('active');
+        document.getElementById('cart-close').onclick = () => cartDrawer.classList.remove('active');
+
+        function addItemToCart(name, price) {
+            cart.push({ name, price, id: Date.now() });
+            saveCart();
+            renderCart();
+            cartDrawer.classList.add('active');
+        }
+
+        function removeItem(id) {
+            cart = cart.filter(i => i.id !== id);
+            saveCart();
+            renderCart();
+        }
+
+        function saveCart() {
+            localStorage.setItem('gripx_cart', JSON.stringify(cart));
+        }
+
+        function renderCart() {
+            cartCountBadge.innerText = cart.length;
+            cartCountBadge.style.display = cart.length > 0 ? 'flex' : 'none';
+            
+            if (cart.length === 0) {
+                cartItemsContainer.innerHTML = '<div class="flex flex-col items-center justify-center h-full text-white/20"><i class="fas fa-shopping-basket text-4xl mb-3"></i><p>Your cart is empty</p></div>';
+            } else {
+                cartItemsContainer.innerHTML = cart.map(item => `
+                    <div class="flex justify-between items-center bg-white/5 p-4 rounded-xl border border-white/5 hover:border-blue-500/30 transition">
+                        <div>
+                            <div class="text-sm uppercase font-bold text-white">${item.name}</div>
+                            <div class="text-xs text-blue-400 font-mono">$${item.price.toFixed(2)}</div>
+                        </div>
+                        <button onclick="removeItem(${item.id})" class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-red-400 hover:bg-red-500 hover:text-white transition">
+                            <i class="fas fa-trash text-xs"></i>
+                        </button>
+                    </div>
+                `).join('');
+            }
+            
+            const total = cart.reduce((sum, item) => sum + item.price, 0);
+            cartTotalDisplay.innerText = `$${total.toFixed(2)}`;
+        }
+
+        function goToCheckout() {
+            if(cart.length === 0) {
+                alert("Your cart is empty! Add some gear first.");
+                return;
+            }
+            saveCart();
+            window.location.href = 'checkout.html';
+        }
+
+        renderCart();
+    </script>
+</body>
+</html>

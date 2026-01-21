@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GripX - Secure Checkout</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #0b010d; color: white; min-height: 100vh; }
+        .navbar { position: fixed; top: 0; width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 20px 8%; background-color: #2d2d2d; z-index: 1000; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+        .logo-img { height: 45px; width: auto; }
+        .back-btn { color: white; text-decoration: none; font-size: 14px; display: flex; align-items: center; gap: 10px; transition: 0.3s; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; }
+        .back-btn:hover { color: #00b7ff; }
+        input, select { background: rgba(255, 255, 255, 0.05) !important; border: 1px solid rgba(255, 255, 255, 0.1) !important; color: white !important; }
+        input:focus { border-color: #00b7ff !important; outline: none; }
+        /* Style for empty required fields */
+        input.error { border-color: #ef4444 !important; background: rgba(239, 68, 68, 0.1) !important; }
+        .summary-card { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.05); }
+        #success-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 5000; align-items: center; justify-content: center; text-align: center; }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="index.html" class="back-btn">
+            <i class="fas fa-arrow-left"></i> Back to Shop
+        </a>
+        <a href="index.html" class="logo-container">
+            <img src="grip x logo.jpg" alt="GripX Logo" class="logo-img">
+        </a>
+        <div class="hidden md:block text-xs uppercase tracking-widest text-white/40">
+            Secure Checkout <i class="fas fa-lock ml-2"></i>
+        </div>
+    </nav>
+
+    <main class="pt-32 pb-20 px-[8%] max-w-7xl mx-auto">
+        <h1 class="text-4xl font-bold mb-10 uppercase tracking-tight">Checkout</h1>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
+            
+            <div class="lg:col-span-2 space-y-10">
+                <section>
+                    <h2 class="text-xl font-bold mb-6 text-blue-500 uppercase tracking-widest">1. Contact Information</h2>
+                    <input type="email" id="email" placeholder="Email Address" class="required-field w-full p-4 rounded-xl">
+                </section>
+
+                <section>
+                    <h2 class="text-xl font-bold mb-6 text-blue-500 uppercase tracking-widest">2. Shipping Address</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <input type="text" id="fname" placeholder="First Name" class="required-field p-4 rounded-xl">
+                        <input type="text" id="lname" placeholder="Last Name" class="required-field p-4 rounded-xl">
+                        <input type="text" id="address" placeholder="Address" class="required-field md:col-span-2 p-4 rounded-xl">
+                        <input type="text" id="city" placeholder="City" class="required-field p-4 rounded-xl">
+                        <input type="text" id="zip" placeholder="Postal Code" class="required-field p-4 rounded-xl">
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="text-xl font-bold mb-6 text-blue-500 uppercase tracking-widest">3. Payment</h2>
+                    
+                    <div class="summary-card p-6 rounded-2xl border border-blue-500/40 bg-blue-500/5 mb-6">
+                        <div class="flex flex-col md:flex-row justify-between items-center gap-6">
+                            <div class="text-center md:text-left">
+                                <h3 class="font-bold uppercase text-lg mb-1">UPI & FamApp</h3>
+                                <p class="text-sm text-white/50 mb-4">Scan the QR code to pay instantly</p>
+                                <a id="fampay-link" href="#" class="inline-flex items-center gap-3 bg-[#ffcc00] hover:bg-[#ebd000] text-black px-6 py-3 rounded-xl font-bold uppercase transition-all text-sm">
+                                    <i class="fas fa-bolt"></i> Open FamApp
+                                </a>
+                            </div>
+                            <div class="bg-white p-3 rounded-2xl shadow-xl shadow-blue-500/20">
+                                <img id="payment-qr" src="" alt="Payment QR" class="w-32 h-32">
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <button onclick="validateAndPay()" class="w-full bg-blue-600 hover:bg-blue-500 py-5 rounded-2xl font-bold uppercase tracking-widest transition-all text-lg shadow-lg shadow-blue-500/20">
+                    Complete Purchase
+                </button>
+            </div>
+
+            <div class="lg:col-span-1">
+                <div class="summary-card p-8 rounded-3xl sticky top-32">
+                    <h2 class="text-xl font-bold mb-6 uppercase">Order Summary</h2>
+                    <div id="checkout-items-list" class="space-y-4 mb-8"></div>
+                    <div class="space-y-4 mb-8 border-t border-white/5 pt-4">
+                        <div class="flex justify-between text-sm">
+                            <span class="text-white/60">Subtotal</span>
+                            <span id="subtotal-val">$0.00</span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-white/60">Shipping</span>
+                            <span class="text-green-400">FREE</span>
+                        </div>
+                    </div>
+                    <div class="border-t border-white/10 pt-4 flex justify-between items-end">
+                        <span class="text-lg font-bold uppercase">Total</span>
+                        <div class="text-right">
+                            <span id="total-val" class="text-2xl font-bold text-blue-500">$0.00</span>
+                            <p class="text-[10px] text-white/40 uppercase tracking-widest">Includes Taxes</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="success-overlay">
+        <div class="p-10">
+            <div class="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-6">
+                <i class="fas fa-check text-4xl text-white"></i>
+            </div>
+            <h2 class="text-4xl font-bold uppercase mb-2">Order Placed!</h2>
+            <p class="text-white/60 mb-8">Thank you for choosing GripX. We've sent a confirmation to your email.</p>
+            <a href="index.html" class="bg-blue-600 px-8 py-4 rounded-xl font-bold uppercase tracking-widest">Back to Home</a>
+        </div>
+    </div>
+
+    <script>
+        const FAM_ID = "9573310164@fam";
+        const MERCHANT_NAME = "GripX Fitness";
+
+        function loadCheckoutData() {
+            const cart = JSON.parse(localStorage.getItem('grip-cart')) || [];
+            const container = document.getElementById('checkout-items-list');
+            const subtotalEl = document.getElementById('subtotal-val');
+            const totalEl = document.getElementById('total-val');
+            const qrImg = document.getElementById('payment-qr');
+            const famLink = document.getElementById('fampay-link');
+
+            if (cart.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 italic">Cart is empty</p>';
+                return;
+            }
+
+            let total = 0;
+            let html = '';
+            cart.forEach(item => {
+                total += item.price;
+                html += `<div class="flex justify-between items-center text-sm"><span class="text-white/60">${item.name}</span><span>$${item.price.toFixed(2)}</span></div>`;
+            });
+
+            container.innerHTML = html;
+            subtotalEl.innerText = `$${total.toFixed(2)}`;
+            totalEl.innerText = `$${total.toFixed(2)}`;
+
+            const upiUrl = `upi://pay?pa=${FAM_ID}&pn=${encodeURIComponent(MERCHANT_NAME)}&am=${total.toFixed(2)}&cu=INR`;
+            famLink.href = upiUrl;
+            qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiUrl)}`;
+        }
+
+        // NEW: VALIDATION LOGIC
+        function validateAndPay() {
+            const fields = document.querySelectorAll('.required-field');
+            let isValid = true;
+
+            fields.forEach(field => {
+                if (field.value.trim() === "") {
+                    field.classList.add('error'); // Add red border style
+                    isValid = false;
+                } else {
+                    field.classList.remove('error');
+                }
+            });
+
+            if (!isValid) {
+                alert("Please fill in all information fields before completing your purchase.");
+                return;
+            }
+
+            // Check if cart is empty
+            const cart = JSON.parse(localStorage.getItem('grip-cart')) || [];
+            if (cart.length === 0) {
+                alert("Your cart is empty!");
+                return;
+            }
+
+            showSuccess();
+        }
+
+        function showSuccess() {
+            localStorage.removeItem('grip-cart');
+            document.getElementById('success-overlay').style.display = 'flex';
+        }
+
+        window.onload = loadCheckoutData;
+    </script>
+</body>
+</html>

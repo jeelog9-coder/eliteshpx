@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GripX - Contact Us</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #0b010d;
+            color: white;
+            min-height: 100vh;
+        }
+
+        /* Navbar (Matching Checkout) */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 8%;
+            background-color: #2d2d2d;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .logo-img {
+            height: 45px;
+            width: auto;
+        }
+
+        .back-btn {
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: bold;
+        }
+
+        .back-btn:hover {
+            color: #00b7ff;
+        }
+
+        /* Theme Styling */
+        input, textarea {
+            background: rgba(255, 255, 255, 0.05) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            color: white !important;
+            transition: all 0.3s ease;
+        }
+
+        input:focus, textarea:focus {
+            border-color: #00b7ff !important;
+            background: rgba(0, 183, 255, 0.05) !important;
+            outline: none;
+            box-shadow: 0 0 15px rgba(0, 183, 255, 0.1);
+        }
+
+        .contact-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: transform 0.3s ease;
+        }
+
+        .contact-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(0, 183, 255, 0.3);
+        }
+
+        .glow-text {
+            text-shadow: 0 0 10px rgba(0, 183, 255, 0.5);
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="index.html" class="back-btn">
+            <i class="fas fa-arrow-left"></i> Back to Shop
+        </a>
+        
+        <a href="index.html" class="logo-container">
+            <img src="grip x logo.jpg" alt="GripX Logo" class="logo-img">
+        </a>
+
+        <div class="hidden md:block text-xs uppercase tracking-widest text-white/40">
+            Support Center <i class="fas fa-headset ml-2"></i>
+        </div>
+    </nav>
+
+    <main class="pt-32 pb-20 px-[8%] max-w-7xl mx-auto">
+        <div class="text-center mb-16">
+            <h1 class="text-5xl font-bold mb-4 uppercase tracking-tighter glow-text">Get In Touch</h1>
+            <p class="text-white/50 max-w-2xl mx-auto uppercase tracking-widest text-sm">
+                Have questions about GripX Pro? Our team is ready to help you level up your performance.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <div class="space-y-6">
+                <div class="contact-card p-8 rounded-3xl">
+                    <div class="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center mb-6">
+                        <i class="fas fa-envelope text-blue-500 text-xl"></i>
+                    </div>
+                    <h3 class="font-bold uppercase mb-2">Email Us</h3>
+                    <p class="text-white/50 text-sm mb-4">Response within 24 hours</p>
+                    <a href="mailto:support@gripx.com" class="text-blue-400 font-bold hover:underline">support@gripx.com</a>
+                </div>
+
+                <div class="contact-card p-8 rounded-3xl">
+                    <div class="w-12 h-12 bg-purple-500/20 rounded-xl flex items-center justify-center mb-6">
+                        <i class="fas fa-comment-dots text-purple-500 text-xl"></i>
+                    </div>
+                    <h3 class="font-bold uppercase mb-2">Social Support</h3>
+                    <p class="text-white/50 text-sm mb-4">DM us on Instagram</p>
+                    <div class="flex gap-4">
+                        <a href="#" class="text-2xl hover:text-blue-400 transition-colors"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="text-2xl hover:text-blue-400 transition-colors"><i class="fab fa-twitter"></i></a>
+                    </div>
+                </div>
+
+                <div class="contact-card p-8 rounded-3xl border-blue-500/20 bg-blue-500/5">
+                    <h3 class="font-bold uppercase mb-2 flex items-center gap-2">
+                        <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                        Live Support
+                    </h3>
+                    <p class="text-sm text-white/60 leading-relaxed">
+                        Mon - Fri: 9am - 6pm EST<br>
+                        Sat - Sun: 10am - 4pm EST
+                    </p>
+                </div>
+            </div>
+
+            <div class="lg:col-span-2">
+                <div class="contact-card p-10 rounded-3xl h-full">
+                    <form action="#" class="space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="space-y-2">
+                                <label class="text-xs uppercase tracking-widest text-white/40 ml-2">Full Name</label>
+                                <input type="text" placeholder="Enter name" class="w-full p-4 rounded-xl focus:ring-1 ring-blue-500">
+                            </div>
+                            <div class="space-y-2">
+                                <label class="text-xs uppercase tracking-widest text-white/40 ml-2">Email Address</label>
+                                <input type="email" placeholder="Enter email" class="w-full p-4 rounded-xl">
+                            </div>
+                        </div>
+
+                        <div class="space-y-2">
+                            <label class="text-xs uppercase tracking-widest text-white/40 ml-2">Subject</label>
+                            <select class="w-full p-4 rounded-xl bg-[#1a1a1a] border border-white/10 text-white/60">
+                                <option>Order Inquiry</option>
+                                <option>Product Feedback</option>
+                                <option>Wholesale/Business</option>
+                                <option>Other</option>
+                            </select>
+                        </div>
+
+                        <div class="space-y-2">
+                            <label class="text-xs uppercase tracking-widest text-white/40 ml-2">Message</label>
+                            <textarea rows="6" placeholder="How can we help?" class="w-full p-4 rounded-xl resize-none"></textarea>
+                        </div>
+
+                        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 py-5 rounded-2xl font-bold uppercase tracking-widest transition-all text-lg shadow-lg shadow-blue-500/20 flex items-center justify-center gap-3">
+                            <i class="fas fa-paper-plane text-sm"></i> Send Message
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <footer class="py-10 border-t border-white/5 text-center">
+        <p class="text-[10px] text-white/20 uppercase tracking-[0.3em]">
+            &copy; 2024 GripX Athletics. Built for the Elite.
+        </p>
+    </footer>
+
+</body>
+</html>

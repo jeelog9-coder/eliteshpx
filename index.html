@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GripX - Fitness Forward</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* --- BASE STYLES --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body, html {
+            height: 100%;
+            background-color: #0b010d;
+            overflow-x: hidden;
+            color: white;
+        }
+
+        /* --- NAVBAR --- */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 25px 8%;
+            transition: all 0.4s ease-in-out;
+            z-index: 1000;
+            background-color: transparent; 
+        }
+
+        .navbar.scrolled {
+            background-color: #2d2d2d !important; 
+            padding: 12px 8%;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo-img {
+            height: 60px;
+            width: auto;
+            transition: all 0.3s ease;
+        }
+
+        .navbar.scrolled .logo-img {
+            height: 45px;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 10px;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+            padding: 8px 20px;
+            border: 1px solid transparent;
+            border-radius: 50px;
+            transition: 0.3s;
+        }
+
+        .nav-links a:hover {
+            border-color: #00b7ff;
+            color: #00b7ff;
+        }
+
+        .nav-icons {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .icon-btn {
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            width: 42px;
+            height: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transition: 0.3s;
+            position: relative;
+        }
+
+        .icon-btn:hover {
+            border-color: #00b7ff;
+            color: #00b7ff;
+        }
+
+        /* --- CART BADGE --- */
+        #cart-count {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #00b7ff;
+            color: white;
+            font-size: 10px;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: none; /* Shown via JS */
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        /* --- CART DRAWER --- */
+        #cart-drawer {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 100%;
+            max-width: 400px;
+            height: 100vh;
+            background: #111;
+            z-index: 3000;
+            transition: 0.5s cubic-bezier(0.77, 0, 0.175, 1);
+            padding: 40px 30px;
+            box-shadow: -10px 0 30px rgba(0,0,0,0.5);
+        }
+
+        #cart-drawer.active {
+            right: 0;
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .menu-btn {
+            display: none; 
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            width: 42px;
+            height: 42px;
+            align-items: center;
+            justify-content: center;
+            transition: 0.3s;
+            margin-right: 10px;
+            z-index: 2001; 
+        }
+
+        /* --- HERO SECTION --- */
+        .hero {
+            height: 100vh;
+            width: 100%;
+            background: radial-gradient(circle at 15% 35%, rgba(0, 110, 255, 0.2) 0%, transparent 45%),
+                        radial-gradient(circle at 85% 75%, rgba(0, 255, 204, 0.15) 0%, transparent 45%),
+                        #0b010d;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 10%;
+        }
+        
+        .hero-content h1 {
+            font-size: clamp(40px, 6vw, 70px);
+            line-height: 1.1;
+            margin-bottom: 25px;
+            text-transform: uppercase;
+            font-weight: 800;
+        }
+
+        .hero-content h1 span {
+            color: #00b7ff;
+        }
+
+        .product-container {
+            flex: 1;
+            display: flex;
+            justify-content: flex-end;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .image-holder {
+            width: 450px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .image-holder img {
+            width: 100%;
+            height: auto;
+            object-fit: contain;
+            filter: drop-shadow(0 20px 50px rgba(0, 183, 255, 0.3)); 
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-30px); }
+        }
+
+        /* --- UPDATED MOBILE MENU --- */
+        @media (max-width: 992px) {
+            .hero { flex-direction: column; text-align: center; padding-top: 120px; }
+            .product-container { justify-content: center; margin-top: 40px; }
+            .image-holder { width: 300px; }
+            
+            .menu-btn { display: flex; order: 2; }
+            .nav-icons { order: 3; }
+            .logo-container { order: 1; margin-right: auto; }
+
+            .nav-links { 
+                position: fixed;
+                top: 0;
+                left: -100%;
+                width: 80%;
+                height: 100vh;
+                background-color: rgba(10, 1, 13, 0.98);
+                backdrop-filter: blur(15px);
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                gap: 40px;
+                transition: left 0.4s cubic-bezier(0.77, 0, 0.175, 1);
+                z-index: 2000;
+            }
+
+            .nav-links.active {
+                left: 0;
+            }
+
+            .nav-links a {
+                font-size: 28px;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 2px;
+                border: none;
+                padding: 10px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar" id="mainNav">
+        <a href="#" class="logo-container">
+            <img src="grip x logo.jpg" alt="GripX Logo" class="logo-img">
+        </a>
+        
+        <div class="menu-btn" id="menu-toggle">
+            <i class="fas fa-bars"></i>
+        </div>
+
+        <ul class="nav-links" id="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="contactus.html">contact us</a></li>
+            <li><a href="shop.html">Shop</a></li>
+            <li><a href="return.html">return</a></li>
+            <li><a href="p1.html">product</a></li>
+            <li><a href="dashbaord.html">dashboard</a></li>
+        </ul>
+
+        <div class="nav-icons">
+            <div class="icon-btn" id="search-open"><i class="fas fa-search"></i></div>
+            <div class="icon-btn" id="cart-open">
+                <i class="fas fa-shopping-cart"></i>
+                <span id="cart-count">0</span>
+            </div>
+        </div>
+    </nav>
+
+    <div id="cart-drawer">
+        <div class="flex justify-between items-center mb-8 border-b border-white/10 pb-4">
+            <h2 class="text-2xl font-bold uppercase tracking-widest">Your <span class="text-blue-500">Cart</span></h2>
+            <div id="cart-close" class="text-3xl cursor-pointer hover:text-blue-500">&times;</div>
+        </div>
+        <div id="cart-items" class="space-y-4 max-h-[60vh] overflow-y-auto">
+            <p class="text-white/40 text-center py-10">Your cart is empty.</p>
+        </div>
+        <div class="absolute bottom-10 left-0 w-full px-8">
+            <div class="flex justify-between text-xl font-bold mb-6">
+                <span>Total:</span>
+                <span id="cart-total">$0.00</span>
+            </div>
+            <button class="w-full bg-blue-600 hover:bg-blue-500 py-4 rounded-xl font-bold uppercase tracking-widest transition-all">Checkout Now</button>
+        </div>
+    </div>
+
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Push your<br><span>Limits</span></h1>
+            <p class="mb-10 opacity-60 max-w-md">The ultimate equipment for the serious athlete. GripX brings you high-performance gear to move fitness forward.</p>
+        </div>
+
+        <div class="product-container">
+            <div class="image-holder">
+                <img src="grip x logo.jpg" alt="Brand Logo">
+            </div>
+        </div>
+    </section>
+
+    <section class="features-section py-20 px-[8%] bg-[#0b010d]">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div class="feature-card text-center group p-8 rounded-2xl border border-white/5 bg-white/5 transition-all duration-300 hover:border-blue-500/50 hover:bg-white/[0.08]">
+                <div class="icon-box mb-6 text-4xl text-blue-500 transition-transform duration-300 group-hover:scale-110"><i class="fas fa-shipping-fast"></i></div>
+                <h3 class="text-xl font-bold mb-2">Free Shipping</h3>
+                <p class="text-white/60 text-sm leading-relaxed">On all orders over $99. Fast, tracked delivery.</p>
+            </div>
+            <div class="feature-card text-center group p-8 rounded-2xl border border-white/5 bg-white/5 transition-all duration-300 hover:border-blue-500/50 hover:bg-white/[0.08]">
+                <div class="icon-box mb-6 text-4xl text-blue-500 transition-transform duration-300 group-hover:scale-110"><i class="fas fa-undo-alt"></i></div>
+                <h3 class="text-xl font-bold mb-2">30-Day Returns</h3>
+                <p class="text-white/60 text-sm leading-relaxed">Easy returns within 30 days for a full refund.</p>
+            </div>
+            <div class="feature-card text-center group p-8 rounded-2xl border border-white/5 bg-white/5 transition-all duration-300 hover:border-blue-500/50 hover:bg-white/[0.08]">
+                <div class="icon-box mb-6 text-4xl text-blue-500 transition-transform duration-300 group-hover:scale-110"><i class="fas fa-shield-alt"></i></div>
+                <h3 class="text-xl font-bold mb-2">Secure Payment</h3>
+                <p class="text-white/60 text-sm leading-relaxed">SSL encrypted checkout ensuring your data stays private.</p>
+            </div>
+            <div class="feature-card text-center group p-8 rounded-2xl border border-white/5 bg-white/5 transition-all duration-300 hover:border-blue-500/50 hover:bg-white/[0.08]">
+                <div class="icon-box mb-6 text-4xl text-blue-500 transition-transform duration-300 group-hover:scale-110"><i class="fas fa-headset"></i></div>
+                <h3 class="text-xl font-bold mb-2">24/7 Support</h3>
+                <p class="text-white/60 text-sm leading-relaxed">Our fitness experts are ready to help you anytime.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-20 px-[8%] bg-[#0b010d]">
+        <h2 class="text-3xl font-bold mb-10 text-center uppercase tracking-widest">Shop by <span class="text-blue-500">Category</span></h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="relative group overflow-hidden rounded-2xl h-[300px] cursor-pointer">
+                <img src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=500" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 opacity-60">
+                <div class="absolute inset-0 flex flex-col justify-end p-8 bg-gradient-to-t from-black/80 to-transparent">
+                    <h3 class="text-2xl font-bold uppercase">Weightlifting</h3>
+                    <p class="text-blue-400 text-sm">Explore Gear &rarr;</p>
+                </div>
+            </div>
+            <div class="relative group overflow-hidden rounded-2xl h-[300px] cursor-pointer">
+                <img src="https://images.unsplash.com/photo-1599058917232-d750c185967c?q=80&w=500" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 opacity-60">
+                <div class="absolute inset-0 flex flex-col justify-end p-8 bg-gradient-to-t from-black/80 to-transparent">
+                    <h3 class="text-2xl font-bold uppercase">Training Apparel</h3>
+                    <p class="text-blue-400 text-sm">Explore Gear &rarr;</p>
+                </div>
+            </div>
+            <div class="relative group overflow-hidden rounded-2xl h-[300px] cursor-pointer">
+                <img src="https://images.unsplash.com/photo-1518481612222-68bbe828eba1?q=80&w=500" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 opacity-60">
+                <div class="absolute inset-0 flex flex-col justify-end p-8 bg-gradient-to-t from-black/80 to-transparent">
+                    <h3 class="text-2xl font-bold uppercase">Accessories</h3>
+                    <p class="text-blue-400 text-sm">Explore Gear &rarr;</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-20 px-[8%] bg-white/5">
+        <div class="flex justify-between items-end mb-10">
+            <div>
+                <h2 class="text-3xl font-bold uppercase tracking-widest">Best <span class="text-blue-500">Sellers</span></h2>
+                <p class="text-white/50">Our most trusted equipment by athletes worldwide.</p>
+            </div>
+            <a href="#" class="text-blue-500 border-b border-blue-500 pb-1 hover:text-white hover:border-white transition-all">View All</a>
+        </div>
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div class="product-card group">
+                <div class="relative bg-[#1a1a1a] rounded-2xl p-10 mb-4 overflow-hidden">
+                    <img src="grip x logo.jpg" alt="Product" class="w-full h-48 object-contain transition-transform duration-300 group-hover:scale-110">
+                    <div class="absolute top-4 right-4 bg-blue-500 text-[10px] font-bold px-3 py-1 rounded-full uppercase">Hot</div>
+                </div>
+                <h3 class="font-bold text-lg">GripX Pro Gloves</h3>
+                <p class="text-blue-500 font-bold mb-4">$45.00</p>
+                <button class="add-to-cart-btn w-full py-3 border border-white/20 rounded-xl hover:bg-white hover:text-black transition-all font-bold uppercase text-xs" 
+                        data-name="GripX Pro Gloves" data-price="45.00">
+                    Add to Cart
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-20 px-[8%] text-center">
+        <div class="max-w-3xl mx-auto bg-gradient-to-r from-blue-600/20 to-purple-600/20 p-12 rounded-3xl border border-white/10">
+            <h2 class="text-3xl font-bold mb-4 uppercase">Join the <span class="text-blue-500">GripX Elite</span></h2>
+            <p class="text-white/60 mb-8">Get 15% off your first order and stay updated on new gear drops.</p>
+            <form class="flex flex-col md:flex-row gap-4">
+                <input type="email" placeholder="Enter your email" class="flex-1 bg-white/5 border border-white/10 px-6 py-4 rounded-xl outline-none focus:border-blue-500 transition-all">
+                <button class="bg-blue-600 hover:bg-blue-500 px-8 py-4 rounded-xl font-bold uppercase tracking-widest transition-all">Subscribe</button>
+            </form>
+        </div>
+    </section>
+
+    <footer class="bg-black/50 border-t border-white/10 pt-20 pb-10 px-[8%]">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
+            <div>
+                <img src="grip x logo.jpg" alt="GripX" class="h-10 mb-6">
+                <p class="text-white/50 leading-relaxed">Pushing the boundaries of fitness equipment. Designed for those who never settle.</p>
+            </div>
+            <div>
+                <h4 class="font-bold uppercase mb-6">Quick Links</h4>
+                <ul class="text-white/50 space-y-4">
+                    <li><a href="#" class="hover:text-blue-500">Shop All</a></li>
+                    <li><a href="#" class="hover:text-blue-500">New Arrivals</a></li>
+                    <li><a href="#" class="hover:text-blue-500">Training Programs</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="font-bold uppercase mb-6">Support</h4>
+                <ul class="text-white/50 space-y-4">
+                    <li><a href="#" class="hover:text-blue-500">Shipping Policy</a></li>
+                    <li><a href="#" class="hover:text-blue-500">Refund Policy</a></li>
+                    <li><a href="#" class="hover:text-blue-500">Contact Us</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="font-bold uppercase mb-6">Follow Us</h4>
+                <div class="flex gap-4">
+                    <a href="#" class="icon-btn"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="icon-btn"><i class="fab fa-facebook"></i></a>
+                    <a href="#" class="icon-btn"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="text-center text-white/20 text-sm border-t border-white/5 pt-10">
+            &copy; 2024 GripX Fitness Equipment. All Rights Reserved.
+        </div>
+    </footer>
+
+    <div id="search-overlay" class="fixed inset-0 bg-black/95 z-[2000] flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300">
+        <div id="search-close" class="absolute top-10 right-10 text-white text-5xl cursor-pointer">&times;</div>
+        <input type="text" placeholder="Search products..." class="w-2/3 bg-transparent border-b-2 border-blue-500 text-3xl p-4 text-white outline-none">
+    </div>
+
+    <script>
+        const navbar = document.getElementById('mainNav');
+        const sOpen = document.getElementById('search-open');
+        const sClose = document.getElementById('search-close');
+        const sOverlay = document.getElementById('search-overlay');
+        
+        const menuToggle = document.getElementById('menu-toggle');
+        const navLinks = document.getElementById('nav-links');
+        const menuIcon = menuToggle.querySelector('i');
+
+        // --- SCROLL EFFECT ---
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 20) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // --- SEARCH OVERLAY ---
+        sOpen.onclick = () => { sOverlay.style.opacity = "1"; sOverlay.style.pointerEvents = "auto"; }
+        sClose.onclick = () => { sOverlay.style.opacity = "0"; sOverlay.style.pointerEvents = "none"; }
+
+        // --- MOBILE MENU ---
+        menuToggle.onclick = () => {
+            navLinks.classList.toggle('active');
+            menuIcon.classList.toggle('fa-bars');
+            menuIcon.classList.toggle('fa-times');
+        }
+
+        // --- CART SYSTEM LOGIC ---
+        const cartOpen = document.getElementById('cart-open');
+        const cartCloseBtn = document.getElementById('cart-close');
+        const cartDrawer = document.getElementById('cart-drawer');
+        const cartItemsContainer = document.getElementById('cart-items');
+        const cartCountBadge = document.getElementById('cart-count');
+        const cartTotalDisplay = document.getElementById('cart-total');
+        const addToCartButtons = document.querySelectorAll('.add-to-cart-btn');
+
+        let cart = [];
+
+        // Open/Close Cart
+        cartOpen.onclick = () => cartDrawer.classList.add('active');
+        cartCloseBtn.onclick = () => cartDrawer.classList.remove('active');
+
+        // Add to Cart Function
+        addToCartButtons.forEach(btn => {
+            btn.onclick = () => {
+                const name = btn.getAttribute('data-name');
+                const price = parseFloat(btn.getAttribute('data-price'));
+                
+                addItemToCart(name, price);
+                renderCart();
+                cartDrawer.classList.add('active'); // Auto open when item added
+            };
+        });
+
+        function addItemToCart(name, price) {
+            cart.push({ name, price, id: Date.now() });
+        }
+
+        function removeItemFromCart(id) {
+            cart = cart.filter(item => item.id !== id);
+            renderCart();
+        }
+
+        function renderCart() {
+            // Update Badge
+            cartCountBadge.innerText = cart.length;
+            cartCountBadge.style.display = cart.length > 0 ? 'flex' : 'none';
+
+            // Update Items List
+            if (cart.length === 0) {
+                cartItemsContainer.innerHTML = '<p class="text-white/40 text-center py-10">Your cart is empty.</p>';
+            } else {
+                cartItemsContainer.innerHTML = cart.map(item => `
+                    <div class="cart-item">
+                        <div>
+                            <p class="font-bold text-sm uppercase">${item.name}</p>
+                            <p class="text-blue-500 text-xs">$${item.price.toFixed(2)}</p>
+                        </div>
+                        <button onclick="removeItemFromCart(${item.id})" class="text-white/20 hover:text-red-500 transition-all">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </div>
+                `).join('');
+            }
+
+            // Update Total
+            const total = cart.reduce((sum, item) => sum + item.price, 0);
+            cartTotalDisplay.innerText = `$${total.toFixed(2)}`;
+        }
+    </script>
+</body>
+</html>
